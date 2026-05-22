@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For You · A Letter</title>
+<meta name="description" content="A letter, sealed with love." />
+<meta name="theme-color" content="#160a10" />
+
+<!-- Heart favicon -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    /* Palette — twilight & candlelight */
+    --bg-0: #160a10;
+    --bg-1: #2a1320;
+    --bg-2: #3a1a2a;
+    --ink: #432a37;
+    --ink-soft: #6b4a58;
+    --paper: #f7f0e3;
+    --paper-edge: #ebdfcb;
+    --rose: #d98a9a;
+    --rose-deep: #b15a6f;
+    --gold: #cda36b;
+    --gold-soft: #e2c79a;
+    --cream: #f3e3d8;
+    --cream-dim: #d8bfca;
+
+    --shadow-soft: 0 30px 80px -30px rgba(0,0,0,.7);
+    --serif: "Cormorant Garamond", Georgia, serif;
+    --sans: "Jost", system-ui, sans-serif;
+    --script: "Pinyon Script", cursive;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--serif);
+    color: var(--cream);
+    background: var(--bg-0);
+    min-height: 100svh;
+    overflow-x: hidden;
+    display: grid;
+    place-items: center;
+    padding: 28px 18px;
+    position: relative;
+  }
+
+  /* ---------- Atmospheric background layers ---------- */
+  .glow {
+    position: fixed;
+    inset: -25%;
+    z-index: 0;
+    background:
+      radial-gradient(40% 50% at 22% 28%, rgba(217,138,154,.40), transparent 70%),
+      radial-gradient(45% 55% at 80% 22%, rgba(226,199,154,.28), transparent 70%),
+      radial-gradient(55% 60% at 65% 88%, rgba(177,90,111,.34), transparent 70%),
+      radial-gradient(60% 70% at 30% 80%, rgba(58,26,42,.9), transparent 75%);
+    background-color: var(--bg-0);
+    filter: saturate(1.05);
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    0%   { transform: translate3d(-2%, -1%, 0) scale(1.05); }
+    100% { transform: translate3d(2%, 2%, 0) scale(1.12); }
+  }
+
+  /* Film grain */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: .05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Drifting petals */
+  .petals { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+  .petal {
+    position: absolute;
+    bottom: -40px;
+    width: 14px; height: 14px;
+    background: radial-gradient(circle at 30% 30%, var(--rose), var(--rose-deep));
+    border-radius: 0 70% 0 70%;
+    opacity: .0;
+    will-change: transform, opacity;
+    animation: rise linear infinite;
+  }
+  @keyframes rise {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg);   opacity: 0; }
+    10%  { opacity: .7; }
+    50%  { transform: translateY(-52vh) translateX(28px) rotate(180deg); }
+    90%  { opacity: .55; }
+    100% { transform: translateY(-108vh) translateX(-22px) rotate(360deg); opacity: 0; }
+  }
+
+  /* ---------- Stage ---------- */
+  .stage { position: relative; z-index: 2; width: 100%; max-width: 560px; }
+
+  /* shared card surface (the stationery) */
+  .card {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.35), transparent 40%),
+      var(--paper);
+    color: var(--ink);
+    border-radius: 6px;
+    padding: 52px 44px 46px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(205,163,107,.35);
+  }
+  /* subtle inner deckle frame */
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px solid rgba(177,90,111,.22);
+    border-radius: 3px;
+    pointer-events: none;
+  }
+  /* warm paper texture */
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.5'/%3E%3C/svg%3E");
+    opacity: .06;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  /* ---------- GATE ---------- */
+  .gate { text-align: center; }
+
+  .kicker {
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: .42em;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+    margin-bottom: 26px;
+  }
+
+  /* Wax seal */
+  .seal {
+    width: 96px; height: 96px;
+    margin: 0 auto 30px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(circle at 35% 30%, #d36f86, var(--rose-deep) 55%, #8c3f54 100%);
+    box-shadow:
+      inset 0 3px 8px rgba(255,255,255,.35),
+      inset 0 -8px 16px rgba(0,0,0,.35),
+      0 10px 22px -8px rgba(140,63,84,.7);
+    border: 2px solid rgba(255,255,255,.12);
+    position: relative;
+    transition: transform .5s cubic-bezier(.2,.9,.3,1.4);
+  }
+  .seal span {
+    font-family: var(--script);
+    font-size: 46px;
+    line-height: 1;
+    color: #fbe7ec;
+    text-shadow: 0 1px 1px rgba(0,0,0,.3);
+    transform: translateY(2px);
+  }
+  .seal::after {
+    content: "";
+    position: absolute; inset: 8px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255,255,255,.28);
+  }
+
+  .prompt {
+    font-size: clamp(28px, 7vw, 40px);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: .01em;
+    margin-bottom: 14px;
+  }
+  .prompt em { font-style: italic; color: var(--rose-deep); }
+
+  .subprompt {
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 36ch;
+    margin: 0 auto 30px;
+  }
+
+  .field { position: relative; margin-bottom: 14px; }
+  .field input {
+    width: 100%;
+    font-family: var(--serif);
+    font-size: 19px;
+    text-align: center;
+    color: var(--ink);
+    background: rgba(255,255,255,.55);
+    border: 1px solid rgba(177,90,111,.35);
+    border-radius: 999px;
+    padding: 15px 20px;
+    outline: none;
+    transition: border-color .25s, box-shadow .25s, background .25s;
+  }
+  .field input::placeholder { color: rgba(107,74,88,.55); font-style: italic; }
+  .field input:focus {
+    border-color: var(--rose-deep);
+    background: rgba(255,255,255,.8);
+    box-shadow: 0 0 0 4px rgba(217,138,154,.18);
+  }
+
+  .btn {
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--cream);
+    background: linear-gradient(180deg, var(--rose) 0%, var(--rose-deep) 100%);
+    border: none;
+    border-radius: 999px;
+    padding: 15px 34px;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 12px 24px -10px rgba(177,90,111,.8);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 18px 30px -10px rgba(177,90,111,.85); filter: brightness(1.05); }
+  .btn:active { transform: translateY(0); }
+
+  .error {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--rose-deep);
+    height: 18px;
+    margin-top: 14px;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+  .error.show { opacity: 1; }
+
+  .shake { animation: shake .45s cubic-bezier(.36,.07,.19,.97); }
+  @keyframes shake {
+    10%, 90% { transform: translateX(-2px); }
+    20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-7px); }
+    40%, 60% { transform: translateX(7px); }
+  }
+
+  /* ---------- LETTER ---------- */
+  .letter { display: none; text-align: left; }
+  .letter .seal { width: 64px; height: 64px; margin-bottom: 18px; }
+  .letter .seal span { font-size: 30px; }
+
+  .letter-date {
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+    text-align: center;
+    margin-bottom: 26px;
+  }
+
+  .salutation {
+    font-size: clamp(26px, 6vw, 34px);
+    font-style: italic;
+    font-weight: 500;
+    color: var(--rose-deep);
+    margin-bottom: 22px;
+  }
+
+  .letter p.body {
+    font-size: 18.5px;
+    line-height: 1.78;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+  .letter p.body:first-letter { /* gentle drop-cap */
+    /* (only stylistic; remove if undesired) */
+  }
+
+  .closing {
+    margin-top: 30px;
+    font-size: 19px;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+  .signature {
+    font-family: var(--script);
+    font-size: 52px;
+    line-height: .9;
+    color: var(--rose-deep);
+    margin-top: 6px;
+  }
+
+  .flourish {
+    text-align: center;
+    color: var(--gold);
+    font-size: 22px;
+    letter-spacing: .5em;
+    margin-top: 34px;
+    opacity: .8;
+  }
+
+  /* reveal animation helpers */
+  .reveal { opacity: 0; transform: translateY(16px); }
+  .reveal.in { opacity: 1; transform: none; transition: opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+
+  .gate.leaving { animation: dissolve .6s ease forwards; }
+  @keyframes dissolve {
+    to { opacity: 0; transform: scale(.96) translateY(-8px); filter: blur(2px); }
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 480px) {
+    .card { padding: 40px 26px 36px; }
+    .card::after { inset: 10px; }
+    .letter p.body { font-size: 17.5px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow, .petal { animation: none !important; }
+    .reveal { transition: opacity .4s ease !important; transform: none !important; }
+  }
+</style>
+</head>
+
+<body>
+  <div class="glow" aria-hidden="true"></div>
+  <div class="petals" id="petals" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <main class="stage">
+    <!-- ========== GATE ========== -->
+    <section class="card gate" id="gate">
+      <p class="kicker" id="kicker"></p>
+
+      <div class="seal" aria-hidden="true"><span id="sealMark"></span></div>
+
+      <h1 class="prompt" id="promptText"></h1>
+      <p class="subprompt" id="subPromptText"></p>
+
+      <div class="field">
+        <input
+          type="password"
+          id="password"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-label="Secret word" />
+      </div>
+
+      <button class="btn" id="unsealBtn"></button>
+
+      <p class="error" id="error" role="alert" aria-live="polite"></p>
+    </section>
+
+    <!-- ========== LETTER ========== -->
+    <article class="card letter" id="letter">
+      <div class="seal" aria-hidden="true"><span id="sealMark2"></span></div>
+      <p class="letter-date reveal" id="dateLine"></p>
+      <h2 class="salutation reveal" id="salutation"></h2>
+      <div id="letterBody"></div>
+      <p class="closing reveal" id="closing"></p>
+      <p class="signature reveal" id="signature"></p>
+      <p class="flourish reveal" id="flourish">❦</p>
+    </article>
+  </main>
+
+<script>
+/* =========================================================================
+   ✦  CHANGE EVERYTHING HERE  ✦
+   This whole block is yours to edit. Nothing technical below this object
+   needs to be touched — just swap the words and the password.
+   ========================================================================= */
+const CONFIG = {
+
+  // 🔑 The secret word she must type (case-insensitive). Change this!
+  password: "ourlove",
+
+  // 💗 The single letter shown inside the wax seal (an initial, a heart, etc.)
+  sealMark: "❤",
+
+  /* ---- The GATE (first screen) ---- */
+  kicker:      "A letter · sealed with love",
+  prompt:      "What is the word <em>only we</em> know?",
+  subPrompt:   "Whisper our little secret to open what I've written for you.",
+  buttonText:  "Unseal the letter",
+  errorText:   "Not quite, my love — try once more.",
+
+  /* ---- The LETTER (revealed screen) ---- */
+  dateLine:    "Written for you",
+  salutation:  "My dearest,",
+
+  // Each string here is one paragraph. Add or remove as many as you like.
+  paragraphs: [
+    "From the moment you came into my life, the ordinary turned golden. The mornings feel softer, the quiet feels warm, and every small thing somehow points back to you.",
+    "You are my favourite thought and my safest place. I love the way you laugh, the way you care so fiercely, and the way being near you feels like coming home after a long, long journey.",
+    "So here it is, in plain and certain words: I am yours, completely and gladly. Thank you for being the best part of every day. I love you — more than these little sentences could ever hold."
+  ],
+
+  closing:     "Forever yours,",
+  signature:   "Your Name"  // ← appears in elegant script
+};
+/* =========================================================================
+   ✦  END OF THINGS TO CHANGE  ✦
+   ========================================================================= */
+
+
+/* ---- wiring (no need to edit below) ---- */
+const $ = (id) => document.getElementById(id);
+
+// populate gate
+$("kicker").textContent      = CONFIG.kicker;
+$("promptText").innerHTML    = CONFIG.prompt;
+$("subPromptText").textContent = CONFIG.subPrompt;
+$("unsealBtn").textContent   = CONFIG.buttonText;
+$("error").textContent       = CONFIG.errorText;
+$("sealMark").textContent    = CONFIG.sealMark;
+$("sealMark2").textContent   = CONFIG.sealMark;
+
+// populate letter
+$("dateLine").textContent    = CONFIG.dateLine;
+$("salutation").textContent  = CONFIG.salutation;
+$("closing").textContent     = CONFIG.closing;
+$("signature").textContent   = CONFIG.signature;
+
+const bodyWrap = $("letterBody");
+CONFIG.paragraphs.forEach((para) => {
+  const p = document.createElement("p");
+  p.className = "body reveal";
+  p.textContent = para;
+  bodyWrap.appendChild(p);
+});
+
+// reveal the letter
+function openLetter() {
+  const gate = $("gate");
+  const letter = $("letter");
+  gate.classList.add("leaving");
+
+  setTimeout(() => {
+    gate.style.display = "none";
+    letter.style.display = "block";
+    $("password").blur();
+
+    // stagger the reveal of each element
+    const items = letter.querySelectorAll(".reveal");
+    items.forEach((el, i) => {
+      setTimeout(() => el.classList.add("in"), 120 + i * 170);
+    });
+    // pop the seal
+    const s = letter.querySelector(".seal");
+    s.style.transform = "scale(0)";
+    setTimeout(() => (s.style.transform = "scale(1)"), 250);
+  }, 580);
+}
+
+function tryUnseal() {
+  const val = $("password").value.trim().toLowerCase();
+  if (val === CONFIG.password.trim().toLowerCase()) {
+    openLetter();
+  } else {
+    const card = $("gate");
+    const err = $("error");
+    err.classList.add("show");
+    card.classList.remove("shake");
+    void card.offsetWidth;       // restart animation
+    card.classList.add("shake");
+    $("password").select();
+  }
+}
+
+$("unsealBtn").addEventListener("click", tryUnseal);
+$("password").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") tryUnseal();
+  $("error").classList.remove("show");
+});
+window.addEventListener("load", () => $("password").focus());
+
+/* ---- drifting petals ---- */
+const petalLayer = $("petals");
+const PETALS = 16;
+for (let i = 0; i < PETALS; i++) {
+  const p = document.createElement("div");
+  p.className = "petal";
+  const size = 8 + Math.random() * 16;
+  p.style.left = Math.random() * 100 + "vw";
+  p.style.width = size + "px";
+  p.style.height = size + "px";
+  p.style.animationDuration = 11 + Math.random() * 14 + "s";
+  p.style.animationDelay = -Math.random() * 20 + "s";
+  if (size > 16) p.style.filter = "blur(1.5px)";       // depth
+  p.style.opacity = 0.25 + Math.random() * 0.4;
+  petalLayer.appendChild(p);
+}
+</script>
+</body>
+</html>
